@@ -1,4 +1,6 @@
+# ── Python / Backend ─────────────────────────────────────────────────────────
 # Virtual environments
+BACKEND/myenv/
 myenv/
 env/
 venv/
@@ -10,34 +12,20 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Jupyter Notebook
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
 # Environment variables
 .env
 
-# VS Code
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Build files
+# Build / dist
 build/
 dist/
 *.egg-info/
-
-# pip cache
 pip-wheel-metadata/
 
-# Testing
+# Testing & coverage
 .pytest_cache/
-
-# Coverage
 .coverage
 htmlcov/
 
@@ -45,5 +33,23 @@ htmlcov/
 *.db
 
 # Temporary files
+*.log
 *.tmp
 *.swp
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+FRONTEND/node_modules/
+node_modules/
+FRONTEND/dist/
+dist-ssr
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
