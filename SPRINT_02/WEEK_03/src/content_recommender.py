@@ -1,38 +1,92 @@
-from unicodedata import category
-import pandas as pd
-import numpy as np
+import chromadb
 
+# =========================================================
+# CONFIG
+# =========================================================
+CHROMA_PATH = "../vector_db/chroma_db"
+COLLECTION_NAME = "products"
 
-# load the csv
-df=pd.read_csv("../data/Furniture.csv")
-# print(df.head(5).to_string())
-# print(df.columns)
+TOP_K = 5
+SIMILARITY_THRESHOLD = 0.35
 
-# SELECT USEFI+ULL FEATURES
-cols=['price','category','material','color','brand','season']
-df = df[cols]
-# print(df.head().to_string())
+# =========================================================
+# LOAD DB
+# =========================================================
+client = chromadb.PersistentClient(path=CHROMA_PATH)
+collection = client.get_collection(name=COLLECTION_NAME)
 
+print("✅ Recommender Ready")
 
-# CREATE STYLE
-def get_style(price):
-    if price>400:
-        return "luxury"
-    elif price>200:
-        return "modern"
-    else:
-        return "minimalist"
+# =========================================================
+# CORE SEARCH FUNCTION
+# =========================================================
+def search_products(query, top_k=TOP_K, category=None, threshold=SIMILARITY_THRESHOLD):
+    """
+    Query → Embed → Search → Filter → Return results
+    """
 
-df['style']=df['price'].apply(get_style)
-# print("1. after adding style \n",df.head().to_string())
-
-
-# CREATING THE DESCIPTION
-def create_description(row):
-    return (
-        f"{row['style']} {row['material']} {row['category']} in {row['color']} color. "
-        f"brand: {row['brand']}. season: {row['season']}. price: {round(row['price'],2)}"
+    results = collection.query(
+        query_texts=[query],
+        n_results=top_k,
+        where={"category": category} if category else None
     )
 
-df['description']=df.apply(create_description,axis=1)
-print("\n 2. after adding description \n",df['brand'].head().to_string())
+    ids = results["ids"][0]
+    docs = results["documents"][0]
+    distances = results["distances"][0]
+    metas = results["metadatas"][0]
+
+    final_results = []
+
+    for i in range(len(ids)):
+
+        # Convert distance → similarity
+        score = 1 / (1 + distances[i])
+
+        if score < threshold:
+            continue
+
+        final_results.append({
+            "product_id": ids[i],
+            "product_name": metas[i]["product_name"],
+            "category": metas[i]["category"],
+            "description": docs[i],
+            "score": round(score, 3)
+        })
+
+    return final_results
+
+
+# =========================================================
+# PRETTY PRINT FUNCTION
+# =========================================================
+def display_results(results):
+    if not results:
+        print("❌ No relevant products found\n")
+        return
+
+    print("\n🎯 Recommended Products:\n")
+
+    for i, item in enumerate(results, 1):
+        print(f"{i}. {item['product_name']}")
+        print(f"   Category: {item['category']}")
+        print(f"   Description: {item['description']}")
+        print(f"   Similarity Score: {item['score']}\n")
+
+
+# =========================================================
+# TEST CASES (IMPORTANT FOR SUBMISSION)
+# =========================================================
+if __name__ == "__main__":
+
+    print("\n🔹 Test 1: Basic Search")
+    results = search_products("modern wooden chair")
+    display_results(results)
+
+    print("\n🔹 Test 2: Category Filter")
+    results = search_products("chair", category="chair")
+    display_results(results)
+
+    print("\n🔹 Test 3: Different Query")
+    results = search_products("luxury sofa")
+    display_results(results)
