@@ -33,13 +33,14 @@ def get_similar_users(user_id, top_k=5):
     if user_id not in user_similarity_df.index:
         return []
 
+    #  sort by similarity score
     similar_users = user_similarity_df.loc[user_id] \
-        .sort_values(ascending=False)
+        .sort_values(ascending=False) 
 
     # filter only meaningful similarities
     similar_users = similar_users[similar_users > 0]
 
-    # return top K users
+    # return top K users as list
     return similar_users.head(top_k).index.tolist()
 
 

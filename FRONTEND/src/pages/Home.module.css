@@ -1,0 +1,23 @@
+.HomePage {
+    background: #161b22;
+
+    color: white;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+.buttonContainer {
+    display: flex;
+
+    gap: 10px;
+}

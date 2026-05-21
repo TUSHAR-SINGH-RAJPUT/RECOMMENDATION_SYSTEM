@@ -3,7 +3,13 @@ import chromadb
 # =========================================================
 # CONFIG
 # =========================================================
-CHROMA_PATH = "../vector_db/chroma_db"
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+
+CHROMA_PATH = os.path.abspath(
+    os.path.join(BASE_DIR, "../vector_db/chroma_db")
+)
 COLLECTION_NAME = "products"
 
 TOP_K = 5
@@ -75,7 +81,7 @@ def display_results(results):
 
 
 # =========================================================
-# TEST CASES (IMPORTANT FOR SUBMISSION)
+# TEST CASES 
 # =========================================================
 if __name__ == "__main__":
 

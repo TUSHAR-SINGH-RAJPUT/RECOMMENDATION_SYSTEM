@@ -1,0 +1,20 @@
+.productCard {
+  border: 1px solid gray;
+  padding: 20px;
+  width: 250px;
+    background: #161b22;
+
+  border: 1px solid #30363d;
+
+  border-radius: 14px;
+
+  padding: 16px;
+}
+
+.productImage img {
+  width: 100%;
+}
+
+.productDetails {
+  margin-top: 10px;
+}

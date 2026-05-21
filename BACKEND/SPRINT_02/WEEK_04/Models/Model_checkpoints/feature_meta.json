@@ -1,0 +1,13 @@
+{
+  "feature_cols": [
+    "cf_score",
+    "content_score",
+    "embedding_similarity",
+    "price_score",
+    "style_match",
+    "item_popularity"
+  ],
+  "n_features": 6,
+  "model_type": "XGBRanker",
+  "objective": "rank:pairwise"
+}
