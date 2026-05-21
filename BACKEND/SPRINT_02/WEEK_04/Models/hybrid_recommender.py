@@ -51,33 +51,37 @@ logger = logging.getLogger(__name__)
 # PATH RESOLUTION
 # ============================================================
 
-# Absolute directory of this file: WEEK_04/Models/
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+# # Absolute directory of this file: WEEK_04/Models/
+# CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Week 02 models dir (for collaborative_filter.py)
-WEEK02_MODELS = os.path.abspath(
-    os.path.join(CURRENT_DIR, "../../../SPRINT_01/WEEK_02/models")
-)
+# # Week 02 models dir (for collaborative_filter.py)
+# WEEK02_MODELS = os.path.abspath(
+#     os.path.join(CURRENT_DIR, "../../../SPRINT_01/WEEK_02/models")
+# )
 
-# Week 03 src dir (for content_recommender.py)
-WEEK03_SRC = os.path.abspath(
-    os.path.join(CURRENT_DIR, "../../WEEK_03/src")
-)
+# # Week 03 src dir (for content_recommender.py)
+# WEEK03_SRC = os.path.abspath(
+#     os.path.join(CURRENT_DIR, "../../WEEK_03/src")
+# )
 
-# Week 03 embeddings dir
-WEEK03_EMBEDDINGS = os.path.abspath(
-    os.path.join(CURRENT_DIR, "../../WEEK_03/embeddings")
-)
+# # Week 03 embeddings dir
+# WEEK03_EMBEDDINGS = os.path.abspath(
+#     os.path.join(CURRENT_DIR, "../../WEEK_03/embeddings")
+# )
 
-# Week 02 data dir
-WEEK02_DATA = os.path.abspath(
-    os.path.join(CURRENT_DIR, "../../../SPRINT_01/WEEK_02/data")
-)
+# # Week 02 data dir
+# WEEK02_DATA = os.path.abspath(
+#     os.path.join(CURRENT_DIR, "../../../SPRINT_01/WEEK_02/data")
+# )
 
 # Add both to sys.path so imports resolve
-sys.path.insert(0, WEEK02_MODELS)
-sys.path.insert(0, WEEK03_SRC)
+# sys.path.insert(0, WEEK02_MODELS)
+# sys.path.insert(0, WEEK03_SRC)
 
+# print("CURRENT_DIR =", CURRENT_DIR)
+# print("WEEK03_SRC =", WEEK03_SRC)
+# print(os.path.exists(WEEK03_SRC))
+# print(os.listdir(WEEK03_SRC))
 
 # ============================================================
 # IMPORT PREVIOUS WEEK MODULES
@@ -86,7 +90,8 @@ sys.path.insert(0, WEEK03_SRC)
 # --- Week 03: Content-Based Recommender ---
 try:
     # pyrefly: ignore [missing-import]
-    from content_recommender import search_products
+    # from content_recommender import search_products
+    from SPRINT_02.WEEK_03.src.content_recommender import search_products
     CONTENT_RECOMMENDER_AVAILABLE = True
     logger.info("✅ Content recommender loaded (Week 03)")
 except Exception as e:
@@ -101,7 +106,8 @@ except Exception as e:
 # --- Week 02: Collaborative Filter ---
 try:
     # pyrefly: ignore [missing-import]
-    from collaborative_filter import recommend_cf
+    # from collaborative_filter import recommend_cf
+    from SPRINT_01.WEEK_02.models.collaborative_filter import recommend_cf
     CF_RECOMMENDER_AVAILABLE = True
     logger.info("✅ Collaborative filter loaded (Week 02)")
 except Exception as e:
