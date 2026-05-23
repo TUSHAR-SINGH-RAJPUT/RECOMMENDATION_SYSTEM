@@ -1,5 +1,8 @@
 from fastapi import APIRouter
-from schemas import RecommendationRequest
+
+from SPRINT_O3.WEEK_06.api.schemas import RecommendationRequest
+
+from SPRINT_01.WEEK_02.models.collaborative_filter import recommend_cf
 
 router = APIRouter(
     prefix="/recommend/collaborative",
@@ -10,26 +13,11 @@ router = APIRouter(
 @router.post("/")
 def collaborative_recommend(request: RecommendationRequest):
 
-    recommendations = [
-        {
-            "product_id": 101,
-            "product_name": "Modern Grey Sofa",
-            "category": "Sofa",
-            "score": 0.95
-        },
-        {
-            "product_id": 102,
-            "product_name": "Wooden Coffee Table",
-            "category": "Table",
-            "score": 0.90
-        },
-        {
-            "product_id": 103,
-            "product_name": "Luxury Recliner",
-            "category": "Chair",
-            "score": 0.87
-        }
-    ]
+    recommendations = recommend_cf(
+        request.user_id,
+        request.query,
+        request.top_k
+    )
 
     return {
         "model": "Collaborative Filtering",

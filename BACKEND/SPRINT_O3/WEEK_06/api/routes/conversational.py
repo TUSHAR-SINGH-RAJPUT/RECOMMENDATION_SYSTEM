@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from schemas import ChatRequest
+from SPRINT_O3.WEEK_06.api.schemas import ChatRequest
 
 router = APIRouter(
     prefix="/recommend/conversational",

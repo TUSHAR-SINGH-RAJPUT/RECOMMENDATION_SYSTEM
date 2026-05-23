@@ -4,8 +4,10 @@ from typing import Optional, List
 
 class RecommendationRequest(BaseModel):
     user_id: int
-    query: Optional[str] = None
-    top_k: int = 5
+    query: str
+    top_k: int = 10
+    category: Optional[str] = None
+    use_xgboost: bool = True
 
 
 class ChatRequest(BaseModel):
@@ -27,3 +29,9 @@ class RecommendationResponse(BaseModel):
 class ChatResponse(BaseModel):
     response: str
     products: List[Product]
+
+class Search_products(BaseModel):
+    query: str
+    top_k: int = 10
+    category: Optional[str] = None
+    

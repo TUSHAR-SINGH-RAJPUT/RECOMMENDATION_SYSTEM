@@ -1,36 +1,75 @@
 from fastapi import APIRouter
-from schemas import RecommendationRequest
 
+# Import embedding/content-based recommender function
+from SPRINT_02.WEEK_03.src.content_recommender import search_products
+
+# Import request schema
+from SPRINT_O3.WEEK_06.api.schemas import Search_products
+
+
+# ============================================================
+# ROUTER CONFIGURATION
+# ============================================================
+# Creates a router for embedding-based recommendation endpoints
+#
+# prefix:
+#   All routes in this file will start with:
+#   /recommend/embedding
+#
+# tags:
+#   Groups endpoints together in FastAPI Swagger docs
+# ============================================================
 router = APIRouter(
     prefix="/recommend/embedding",
     tags=["Embedding Recommendations"]
 )
 
 
+# ============================================================
+# EMBEDDING RECOMMENDATION ENDPOINT
+# ============================================================
+# POST /recommend/embedding/
+#
+# This endpoint:
+#   1. Accepts a user query
+#   2. Converts query into embeddings
+#   3. Searches similar products using vector similarity
+#   4. Returns top matching products
+#
+# Request Body:
+# {
+#     "query": "modern wooden sofa",
+#     "top_k": 5,
+#     "category": "Living Room"
+# }
+#
+# Returns:
+# {
+#     "model": "Embedding Based Recommendation",
+#     "query": "...",
+#     "recommendations": [...]
+# }
+# ============================================================
 @router.post("/")
-def embedding_recommend(request: RecommendationRequest):
+def embedding_recommend(request: Search_products):
 
-    recommendations = [
-        {
-            "product_id": 201,
-            "product_name": "Minimalist White Chair",
-            "category": "Chair",
-            "score": 0.93
-        },
-        {
-            "product_id": 202,
-            "product_name": "Scandinavian Table",
-            "category": "Table",
-            "score": 0.89
-        },
-        {
-            "product_id": 203,
-            "product_name": "Modern TV Unit",
-            "category": "Living Room",
-            "score": 0.86
-        }
-    ]
+    # --------------------------------------------------------
+    # Generate embedding-based recommendations
+    #
+    # query:
+    #   User search text
+    #
+    # top_k:
+    #   Number of recommendations to return
+    # --------------------------------------------------------
+    recommendations = search_products(
+        query=request.query,
+        top_k=request.top_k
+    )
 
+    # --------------------------------------------------------
+    # API Response
+    # --------------------------------------------------------
     return {
         "model": "Embedding Based Recommendation",
         "query": request.query,

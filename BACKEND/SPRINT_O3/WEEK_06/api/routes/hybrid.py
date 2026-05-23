@@ -1,35 +1,22 @@
 from fastapi import APIRouter
-from schemas import RecommendationRequest
+from SPRINT_O3.WEEK_06.api.schemas import RecommendationRequest
+from SPRINT_02.WEEK_04.Models.hybrid_recommender import hybrid_recommender
 
 router = APIRouter(
     prefix="/recommend/hybrid",
     tags=["Hybrid Recommendations"]
 )
 
-
 @router.post("/")
 def hybrid_recommend(request: RecommendationRequest):
 
-    recommendations = [
-        {
-            "product_id": 301,
-            "product_name": "Luxury Leather Sofa",
-            "category": "Sofa",
-            "score": 0.98
-        },
-        {
-            "product_id": 302,
-            "product_name": "Premium TV Stand",
-            "category": "Living Room",
-            "score": 0.94
-        },
-        {
-            "product_id": 303,
-            "product_name": "Designer Coffee Table",
-            "category": "Table",
-            "score": 0.91
-        }
-    ]
+    recommendations = hybrid_recommender(
+        user_id=request.user_id,
+        query=request.query,
+        top_k=request.top_k,
+        category=request.category,
+        use_xgboost=request.use_xgboost
+    )
 
     return {
         "model": "Hybrid Recommendation System",
