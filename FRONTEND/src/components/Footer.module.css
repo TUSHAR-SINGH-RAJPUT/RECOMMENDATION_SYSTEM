@@ -1,0 +1,62 @@
+.footer {
+  padding: 40px 32px 24px;
+  background: rgba(10, 14, 26, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 80px;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logo {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00d4ff, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tagline {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.info {
+  text-align: right;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.tech {
+  color: #475569;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.border {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+  margin: 24px 0 16px;
+}
+
+.copy {
+  text-align: center;
+  color: #334155;
+  font-size: 0.75rem;
+}

@@ -44,41 +44,48 @@ def get_similar_users(user_id, top_k=5):
     return similar_users.head(top_k).index.tolist()
 
 
-# print(get_similar_users(2))
 def recommend_cf(user_id, n=10):
-    # Step 0: check if user exists
+
     if user_id not in user_item_matrix.index:
         return []
 
-    # Step 1: get similar users with scores
     similar_users = user_similarity_df.loc[user_id] \
         .sort_values(ascending=False)
 
-    # keep only positive similarity
     similar_users = similar_users[similar_users > 0]
 
-    # Step 2: get items already seen by user
     user_items = set(
         user_item_matrix.loc[user_id][
             user_item_matrix.loc[user_id] > 0
         ].index
     )
 
-    # Step 3: collect recommendation scores
     scores = {}
 
     for sim_user, sim_score in similar_users.items():
+
         sim_user_items = user_item_matrix.loc[sim_user]
 
         for item, value in sim_user_items.items():
-            # only consider items the similar user interacted with
+
             if value > 0 and item not in user_items:
-                # weighted scoring
+
                 scores[item] = scores.get(item, 0) + sim_score
 
-    # Step 4: sort items by score
-    ranked_items = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    ranked_items = sorted(
+        scores.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
 
-    # Step 5: return top N product_ids
-    return [item for item, _ in ranked_items[:n]]
+    recommendations = []
 
+    for item, score in ranked_items[:n]:
+
+        recommendations.append({
+            "product_name": str(item),
+            "category": "Collaborative Recommendation",
+            "score": float(score)
+        })
+
+    return recommendations

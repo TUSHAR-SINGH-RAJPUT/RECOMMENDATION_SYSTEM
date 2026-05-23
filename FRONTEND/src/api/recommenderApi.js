@@ -1,61 +1,74 @@
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = 'http://127.0.0.1:8000';
 
+/**
+ * Wraps a fetch call with performance timing.
+ * Returns { data, responseTime }
+ */
+async function timedFetch(url, options) {
+  const start = performance.now();
 
-// ======================================================
-// EMBEDDING API
-// ======================================================
-export async function getEmbeddingRecommendations(data) {
+  const response = await fetch(url, options);
 
-    const response = await fetch(
-        `${BASE_URL}/recommend/embedding/`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        }
-    );
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+  }
 
-    return response.json();
+  const data = await response.json();
+  const responseTime = Math.round(performance.now() - start);
+
+  return { data, responseTime };
 }
 
-
-// ======================================================
-// COLLABORATIVE API
-// ======================================================
-export async function getCollaborativeRecommendations(data) {
-
-    const response = await fetch(
-        `${BASE_URL}/recommend/collaborative/`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        }
-    );
-
-    return response.json();
+function postOptions(body) {
+  return {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  };
 }
 
+// ============================================================
+// EMBEDDING (Content-Based)
+// ============================================================
+export async function getEmbeddingRecommendations({ query, top_k = 10, category }) {
+  const body = { query, top_k };
+  if (category) body.category = category;
 
-// ======================================================
-// HYBRID API
-// ======================================================
-export async function getHybridRecommendations(data) {
+  return timedFetch(
+    `${BASE_URL}/recommend/embedding/`,
+    postOptions(body)
+  );
+}
 
-    const response = await fetch(
-        `${BASE_URL}/recommend/hybrid/`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        }
-    );
+// ============================================================
+// COLLABORATIVE FILTERING
+// ============================================================
+export async function getCollaborativeRecommendations({ user_id, query, top_k = 10 }) {
+  return timedFetch(
+    `${BASE_URL}/recommend/collaborative/`,
+    postOptions({ user_id, query, top_k })
+  );
+}
 
-    return response.json();
+// ============================================================
+// HYBRID (CF + Embedding)
+// ============================================================
+export async function getHybridRecommendations({ user_id, query, top_k = 10, category, use_xgboost = true }) {
+  const body = { user_id, query, top_k, use_xgboost };
+  if (category) body.category = category;
+
+  return timedFetch(
+    `${BASE_URL}/recommend/hybrid/`,
+    postOptions(body)
+  );
+}
+
+// ============================================================
+// CONVERSATIONAL AI
+// ============================================================
+export async function getConversationalRecommendations({ user_id, query }) {
+  return timedFetch(
+    `${BASE_URL}/recommend/conversational/`,
+    postOptions({ user_id, query })
+  );
 }

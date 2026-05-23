@@ -1,12 +1,5 @@
-// import React from "react";
-import ProductPage from "./pages/ProductPage";
+import Home from './pages/Home';
 
-const App = () => {
-  return (
-    <div>
-      <ProductPage />
-    </div>
-  );
-};
-
-export default App;
+export default function App() {
+  return <Home />;
+}
