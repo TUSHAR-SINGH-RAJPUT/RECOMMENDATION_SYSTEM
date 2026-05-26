@@ -1,54 +1,50 @@
 /* ============================================================
-   DESIGN SYSTEM — FurniAI
+   DESIGN SYSTEM - RoomSense Futuristic Interface
    ============================================================ */
 
-/* --- Reset --- */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* --- Root Variables --- */
 :root {
-  /* Colors */
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #0f1629;
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --bg-card-hover: rgba(255, 255, 255, 0.06);
-
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --text-dim: #334155;
-
-  --accent-cyan: #00d4ff;
-  --accent-violet: #7c3aed;
-  --accent-emerald: #10b981;
-  --accent-amber: #fbbf24;
-  --accent-rose: #f472b6;
-  --accent-blue: #60a5fa;
-
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.1);
-
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
-
-  /* Typography */
+  --bg-primary: #070912;
+  --bg-secondary: #0d1424;
+  --bg-card: rgba(235, 250, 255, 0.065);
+  --bg-card-hover: rgba(235, 250, 255, 0.105);
+  --text-primary: #f4fbff;
+  --text-secondary: #bfd3df;
+  --text-muted: #88a2b4;
+  --text-dim: #4d6477;
+  --accent-cyan: #26f3ff;
+  --accent-violet: #a78bfa;
+  --accent-emerald: #3fffb0;
+  --accent-amber: #ffd166;
+  --accent-rose: #ff5ea8;
+  --accent-blue: #5aa7ff;
+  --wood: #1b6fff;
+  --walnut: #09111f;
+  --clay: #ff5ea8;
+  --linen: #e9faff;
+  --olive: #3fffb0;
+  --brass: #26f3ff;
+  --border-subtle: rgba(160, 222, 255, 0.13);
+  --border-light: rgba(160, 222, 255, 0.24);
+  --glass-bg: rgba(10, 18, 34, 0.72);
+  --glass-border: rgba(160, 222, 255, 0.18);
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading: 'Outfit', 'Inter', sans-serif;
-
-  /* Spacing */
   --container-max: 1280px;
   --section-padding: 32px;
-
-  /* Transitions */
   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* --- Body --- */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -59,14 +55,28 @@ body {
   overflow-x: hidden;
 }
 
-/* Subtle grid background */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(124, 58, 237, 0.04) 0%, transparent 50%);
+    linear-gradient(135deg, rgba(4, 8, 17, 0.98), rgba(8, 13, 26, 0.96)),
+    radial-gradient(ellipse at 18% 8%, rgba(38, 243, 255, 0.19) 0%, transparent 38%),
+    radial-gradient(ellipse at 82% 16%, rgba(255, 94, 168, 0.14) 0%, transparent 34%),
+    radial-gradient(ellipse at 50% 100%, rgba(63, 255, 176, 0.1) 0%, transparent 42%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(38, 243, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167, 139, 250, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -76,32 +86,30 @@ body::before {
   z-index: 1;
 }
 
-/* --- Scrollbar --- */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: #070912;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: rgba(38, 243, 255, 0.35);
+  border: 2px solid #070912;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(38, 243, 255, 0.55);
 }
 
-/* --- Selection --- */
 ::selection {
-  background: rgba(0, 212, 255, 0.25);
+  background: rgba(38, 243, 255, 0.34);
   color: white;
 }
 
-/* --- Links --- */
 a {
-  color: var(--accent-cyan);
+  color: var(--brass);
   text-decoration: none;
 }

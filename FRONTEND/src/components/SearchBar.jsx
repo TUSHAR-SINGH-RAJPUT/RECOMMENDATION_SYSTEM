@@ -13,8 +13,8 @@ const SUGGESTIONS = [
 export default function SearchBar({ onSearch, loading }) {
   const [value, setValue] = useState('');
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleSubmit(event) {
+    event.preventDefault();
     if (value.trim()) onSearch(value.trim());
   }
 
@@ -27,13 +27,13 @@ export default function SearchBar({ onSearch, loading }) {
     <div className={styles.wrapper}>
       <form className={styles.searchForm} onSubmit={handleSubmit}>
         <div className={styles.inputWrapper}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon}>S</span>
           <input
             type="text"
             className={styles.input}
-            placeholder="Describe the furniture you're looking for..."
+            placeholder="Describe the furniture you are looking for..."
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(event) => setValue(event.target.value)}
             id="search-input"
           />
         </div>
@@ -43,24 +43,20 @@ export default function SearchBar({ onSearch, loading }) {
           disabled={loading || !value.trim()}
           id="search-button"
         >
-          {loading ? (
-            <span className={styles.spinner} />
-          ) : (
-            'Search'
-          )}
+          {loading ? <span className={styles.spinner} /> : 'Search'}
         </button>
       </form>
 
       <div className={styles.suggestions}>
         <span className={styles.sugLabel}>Try:</span>
-        {SUGGESTIONS.map((s) => (
+        {SUGGESTIONS.map((suggestion) => (
           <button
-            key={s}
+            key={suggestion}
             className={styles.chip}
-            onClick={() => handleSuggestion(s)}
+            onClick={() => handleSuggestion(suggestion)}
             type="button"
           >
-            {s}
+            {suggestion}
           </button>
         ))}
       </div>

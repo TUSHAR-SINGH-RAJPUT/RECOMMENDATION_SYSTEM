@@ -1,10 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-# Import embedding/content-based recommender function
-from SPRINT_02.WEEK_03.src.content_recommender import search_products
-
-# Import request schema
-from SPRINT_03.WEEK_06.api.schemas import Search_products
+from SPRINT_03.WEEK_06.api.schemas import SearchProductsRequest
+from SPRINT_03.WEEK_06.api.services.recommendation_service import (
+    get_embedding_recommendations,
+)
 
 
 # ============================================================
@@ -51,28 +50,24 @@ router = APIRouter(
 # }
 # ============================================================
 @router.post("/")
-def embedding_recommend(request: Search_products):
+def embedding_recommend(request: SearchProductsRequest):
+    """Semantic search endpoint backed by sentence embeddings and ChromaDB."""
 
-    # --------------------------------------------------------
-    # Generate embedding-based recommendations
-    #
-    # query:
-    #   User search text
-    #
-    # top_k:
-    #   Number of recommendations to return
-    # --------------------------------------------------------
-    recommendations = search_products(
-        query=request.query,
-        top_k=request.top_k,
-        category=request.category
-    )
+    try:
+        recommendations = get_embedding_recommendations(
+            query=request.query,
+            top_k=request.top_k,
+            category=request.category,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Embedding recommendation failed: {exc}",
+        ) from exc
 
-    # --------------------------------------------------------
-    # API Response
-    # --------------------------------------------------------
     return {
         "model": "Embedding Based Recommendation",
         "query": request.query,
-        "recommendations": recommendations
+        "count": len(recommendations),
+        "recommendations": recommendations,
     }

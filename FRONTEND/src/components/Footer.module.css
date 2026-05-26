@@ -1,7 +1,7 @@
 .footer {
   padding: 40px 32px 24px;
-  background: rgba(10, 14, 26, 0.9);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(7, 9, 18, 0.92);
+  border-top: 1px solid rgba(160, 222, 255, 0.11);
   margin-top: 80px;
 }
 
@@ -25,38 +25,38 @@
   font-family: 'Outfit', sans-serif;
   font-size: 1.3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #00d4ff, #7c3aed);
+  background: linear-gradient(135deg, #26f3ff, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .tagline {
-  color: #64748b;
+  color: var(--text-dim);
   font-size: 0.85rem;
 }
 
 .info {
   text-align: right;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.85rem;
   line-height: 1.6;
 }
 
 .tech {
-  color: #475569;
+  color: var(--text-dim);
   font-size: 0.75rem;
   margin-top: 4px;
 }
 
 .border {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(38, 243, 255, 0.26), transparent);
   margin: 24px 0 16px;
 }
 
 .copy {
   text-align: center;
-  color: #334155;
+  color: var(--text-dim);
   font-size: 0.75rem;
 }

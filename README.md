@@ -24,7 +24,7 @@ RECOMMENDATION_SYSTEM/
 │
 ├── BACKEND/
 │   ├── SPRINT_01/ & SPRINT_02/    # Data generation & classical ML models
-│   ├── SPRINT_O3/WEEK_06/         # FastAPI Backend & Streamlit Dashboard
+│   ├── SPRINT_03/WEEK_06/         # FastAPI Backend & React-connected API
 │   │   ├── api/
 │   │   │   ├── routes/            # collaborative.py, embedding.py, hybrid.py, conversational.py
 │   │   │   ├── main.py            # FastAPI entry point
@@ -59,7 +59,7 @@ cd BACKEND
 # Activate virtual environment (Windows)
 myenv\Scripts\activate
 # Start the server
-uvicorn SPRINT_O3.WEEK_06.api.main:app --reload --host 127.0.0.1 --port 8000
+uvicorn SPRINT_03.WEEK_06.api.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 The API will be available at `http://127.0.0.1:8000`. You can view the Swagger UI documentation at `http://127.0.0.1:8000/docs`.

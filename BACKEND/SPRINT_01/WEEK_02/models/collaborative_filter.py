@@ -45,6 +45,7 @@ def get_similar_users(user_id, top_k=5):
 
 
 def recommend_cf(user_id, n=10):
+    """Recommend unseen items from the nearest users in the interaction matrix."""
 
     if user_id not in user_item_matrix.index:
         return []
@@ -83,6 +84,7 @@ def recommend_cf(user_id, n=10):
     for item, score in ranked_items[:n]:
 
         recommendations.append({
+            "product_id": str(item),
             "product_name": str(item),
             "category": "Collaborative Recommendation",
             "score": float(score)

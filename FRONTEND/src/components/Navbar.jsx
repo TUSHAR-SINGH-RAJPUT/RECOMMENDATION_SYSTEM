@@ -2,21 +2,20 @@ import { useState } from 'react';
 import styles from './Navbar.module.css';
 
 const MODEL_OPTIONS = [
-  { value: 'embedding', label: 'Embedding', desc: 'Content-based semantic search', icon: '🧬' },
-  { value: 'collaborative', label: 'Collaborative', desc: 'User behavior patterns', icon: '👥' },
-  { value: 'hybrid', label: 'Hybrid', desc: 'Combined CF + Embedding', icon: '⚡' },
-  { value: 'conversational', label: 'Conversational', desc: 'AI chat recommendations', icon: '💬' },
+  { value: 'embedding', label: 'Embedding', desc: 'Content-based semantic search', icon: 'E' },
+  { value: 'hybrid', label: 'Hybrid', desc: 'CF + semantic + ranking', icon: 'H' },
+  { value: 'collaborative', label: 'Collaborative', desc: 'User behavior patterns', icon: 'C' },
 ];
 
 export default function Navbar({ selectedModel, onModelChange }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const current = MODEL_OPTIONS.find(m => m.value === selectedModel);
+  const current = MODEL_OPTIONS.find((model) => model.value === selectedModel);
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.logo}>
-        <span className={styles.logoIcon}>🛋️</span>
-        <span className={styles.logoText}>FurniAI</span>
+        <span className={styles.logoIcon}>AI</span>
+        <span className={styles.logoText}>RoomSense</span>
       </div>
 
       <div className={styles.modelSelector}>
@@ -24,27 +23,32 @@ export default function Navbar({ selectedModel, onModelChange }) {
           className={styles.selectorBtn}
           onClick={() => setDropdownOpen(!dropdownOpen)}
           id="model-selector-btn"
+          type="button"
         >
           <span className={styles.selectorIcon}>{current?.icon}</span>
           <span className={styles.selectorLabel}>{current?.label}</span>
-          <span className={`${styles.chevron} ${dropdownOpen ? styles.chevronOpen : ''}`}>▾</span>
+          <span className={`${styles.chevron} ${dropdownOpen ? styles.chevronOpen : ''}`}>v</span>
         </button>
 
         {dropdownOpen && (
           <div className={styles.dropdown}>
-            {MODEL_OPTIONS.map(opt => (
+            {MODEL_OPTIONS.map((option) => (
               <button
-                key={opt.value}
-                className={`${styles.dropdownItem} ${selectedModel === opt.value ? styles.active : ''}`}
-                onClick={() => { onModelChange(opt.value); setDropdownOpen(false); }}
-                id={`model-option-${opt.value}`}
+                key={option.value}
+                className={`${styles.dropdownItem} ${selectedModel === option.value ? styles.active : ''}`}
+                onClick={() => {
+                  onModelChange(option.value);
+                  setDropdownOpen(false);
+                }}
+                id={`model-option-${option.value}`}
+                type="button"
               >
-                <span className={styles.optIcon}>{opt.icon}</span>
+                <span className={styles.optIcon}>{option.icon}</span>
                 <div className={styles.optInfo}>
-                  <span className={styles.optLabel}>{opt.label}</span>
-                  <span className={styles.optDesc}>{opt.desc}</span>
+                  <span className={styles.optLabel}>{option.label}</span>
+                  <span className={styles.optDesc}>{option.desc}</span>
                 </div>
-                {selectedModel === opt.value && <span className={styles.checkmark}>✓</span>}
+                {selectedModel === option.value && <span className={styles.checkmark}>OK</span>}
               </button>
             ))}
           </div>

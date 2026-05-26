@@ -2,26 +2,27 @@ import styles from './RecommendationCard.module.css';
 
 function getCategoryColor(category) {
   const colors = {
-    bed: '#f472b6',
-    chair: '#60a5fa',
-    sofa: '#34d399',
-    table: '#fbbf24',
-    desk: '#a78bfa',
-    lighting: '#fb923c',
+    bed: '#c47b67',
+    chair: '#d7a15f',
+    sofa: '#8fa06d',
+    table: '#b86f52',
+    desk: '#b08a61',
+    lighting: '#f4c987',
   };
-  return colors[category?.toLowerCase()] || '#94a3b8';
+  return colors[category?.toLowerCase()] || '#a08770';
 }
 
 function getScoreColor(score) {
-  if (score >= 0.8) return '#10b981';
-  if (score >= 0.5) return '#fbbf24';
-  return '#f87171';
+  if (score >= 0.8) return '#8fa06d';
+  if (score >= 0.5) return '#d7a15f';
+  return '#c47b67';
 }
 
 export default function RecommendationCard({ product, rank }) {
+  const score = Number(product.score ?? product.final_score ?? 0);
   const catColor = getCategoryColor(product.category);
-  const scoreColor = getScoreColor(product.score);
-  const scorePercent = Math.round((product.score || 0) * 100);
+  const scoreColor = getScoreColor(score);
+  const scorePercent = Math.max(0, Math.min(100, Math.round(score * 100)));
 
   return (
     <div className={styles.card} style={{ animationDelay: `${rank * 0.08}s` }}>
@@ -43,9 +44,9 @@ export default function RecommendationCard({ product, rank }) {
 
         <div className={styles.scoreSection}>
           <div className={styles.scoreHeader}>
-            <span className={styles.scoreLabel}>Similarity Score</span>
+            <span className={styles.scoreLabel}>Recommendation Score</span>
             <span className={styles.scoreValue} style={{ color: scoreColor }}>
-              {product.score?.toFixed(3)}
+              {score.toFixed(3)}
             </span>
           </div>
           <div className={styles.scoreBar}>

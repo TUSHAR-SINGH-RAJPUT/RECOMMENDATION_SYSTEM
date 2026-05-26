@@ -3,13 +3,11 @@ import {
   getEmbeddingRecommendations,
   getCollaborativeRecommendations,
   getHybridRecommendations,
-  getConversationalRecommendations,
 } from '../api/recommenderApi';
 
 export default function useRecommendations() {
   const [selectedModel, setSelectedModel] = useState('embedding');
   const [results, setResults] = useState([]);
-  const [aiResponse, setAiResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [metrics, setMetrics] = useState(null);
@@ -20,51 +18,22 @@ export default function useRecommendations() {
 
     setLoading(true);
     setError(null);
-    setAiResponse(null);
 
     try {
       let response;
 
-      switch (selectedModel) {
-        case 'embedding':
-          response = await getEmbeddingRecommendations({ query });
-          setResults(response.data.recommendations || []);
-          break;
-
-        case 'collaborative':
-          response = await getCollaborativeRecommendations({
-            user_id: userId,
-            query,
-          });
-          setResults(response.data.recommendations || []);
-          break;
-
-        case 'hybrid':
-          response = await getHybridRecommendations({
-            user_id: userId,
-            query,
-          });
-          setResults(response.data.recommendations || []);
-          break;
-
-        case 'conversational':
-          response = await getConversationalRecommendations({
-            user_id: userId,
-            query,
-          });
-          setResults(response.data.products || []);
-          setAiResponse(response.data.response || null);
-          break;
-
-        default:
-          throw new Error(`Unknown model: ${selectedModel}`);
+      if (selectedModel === 'embedding') {
+        response = await getEmbeddingRecommendations({ query });
+      } else if (selectedModel === 'collaborative') {
+        response = await getCollaborativeRecommendations({ user_id: userId, query });
+      } else if (selectedModel === 'hybrid') {
+        response = await getHybridRecommendations({ user_id: userId, query });
+      } else {
+        throw new Error(`Unknown model: ${selectedModel}`);
       }
 
-      const products =
-        selectedModel === 'conversational'
-          ? response.data.products || []
-          : response.data.recommendations || [];
-
+      const products = response.data.recommendations || [];
+      setResults(products);
       setMetrics({
         model: selectedModel,
         responseTime: response.responseTime,
@@ -85,7 +54,6 @@ export default function useRecommendations() {
     selectedModel,
     setSelectedModel,
     results,
-    aiResponse,
     loading,
     error,
     metrics,

@@ -7,13 +7,13 @@ function extractPrice(description) {
 
 function getCategoryColor(category) {
   const colors = {
-    bed: '#f472b6',
-    chair: '#60a5fa',
-    sofa: '#34d399',
-    table: '#fbbf24',
-    desk: '#a78bfa',
+    bed: '#c47b67',
+    chair: '#d7a15f',
+    sofa: '#8fa06d',
+    table: '#b86f52',
+    desk: '#b08a61',
   };
-  return colors[category?.toLowerCase()] || '#94a3b8';
+  return colors[category?.toLowerCase()] || '#a08770';
 }
 
 export default function ProductCard({ product }) {

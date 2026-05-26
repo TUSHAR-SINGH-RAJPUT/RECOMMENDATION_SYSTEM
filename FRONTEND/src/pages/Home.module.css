@@ -1,44 +1,57 @@
-/* ============================================================
-   HOME PAGE STYLES
-   ============================================================ */
-
 .page {
   min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(7, 9, 18, 0) 0%, rgba(9, 16, 31, 0.72) 48%, rgba(7, 9, 18, 0.86) 100%);
 }
 
-/* --- Hero --- */
 .hero {
   text-align: center;
-  padding: 80px 32px 50px;
+  padding: 96px 32px 62px;
   position: relative;
   overflow: hidden;
 }
 
 .heroGlow {
   position: absolute;
-  top: -120px;
+  top: -170px;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(0, 212, 255, 0.12) 0%, rgba(124, 58, 237, 0.06) 40%, transparent 70%);
+  width: min(980px, 92vw);
+  height: 540px;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(38, 243, 255, 0.25) 0%, transparent 36%),
+    radial-gradient(circle at 64% 45%, rgba(255, 94, 168, 0.14) 0%, transparent 42%),
+    radial-gradient(circle at 34% 56%, rgba(63, 255, 176, 0.12) 0%, transparent 38%);
   pointer-events: none;
   z-index: 0;
+  filter: blur(4px);
+}
+
+.heroKicker {
+  position: relative;
+  z-index: 1;
+  color: var(--accent-cyan);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  margin-bottom: 14px;
 }
 
 .heroTitle {
   font-family: 'Outfit', sans-serif;
-  font-size: 3.2rem;
+  font-size: clamp(2.45rem, 5vw, 4.7rem);
   font-weight: 800;
   color: var(--text-primary);
-  line-height: 1.15;
+  line-height: 1.05;
   margin-bottom: 16px;
   position: relative;
   z-index: 1;
+  text-shadow: 0 0 34px rgba(38, 243, 255, 0.18);
 }
 
 .heroAccent {
-  background: linear-gradient(135deg, #00d4ff, #7c3aed);
+  background: linear-gradient(135deg, #26f3ff, #a78bfa 48%, #3fffb0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -47,7 +60,7 @@
 .heroSubtitle {
   color: var(--text-secondary);
   font-size: 1.1rem;
-  max-width: 580px;
+  max-width: 620px;
   margin: 0 auto 20px;
   line-height: 1.6;
   position: relative;
@@ -58,10 +71,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
+  padding: 7px 16px;
+  background: rgba(10, 18, 34, 0.58);
+  border: 1px solid rgba(38, 243, 255, 0.22);
+  border-radius: 10px;
   color: var(--text-muted);
   font-size: 0.8rem;
   margin-bottom: 28px;
@@ -69,36 +82,33 @@
   z-index: 1;
 }
 
-/* --- Main Content --- */
 .main {
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--section-padding);
 }
 
-/* --- Error Banner --- */
 .errorBanner {
   display: flex;
   align-items: flex-start;
   gap: 14px;
   padding: 18px 22px;
-  background: rgba(248, 113, 113, 0.08);
-  border: 1px solid rgba(248, 113, 113, 0.2);
-  border-radius: 14px;
+  background: rgba(255, 94, 168, 0.1);
+  border: 1px solid rgba(255, 94, 168, 0.28);
+  border-radius: 8px;
   margin-bottom: 24px;
-  color: #fca5a5;
+  color: #ffc7df;
   font-size: 0.9rem;
-  animation: fadeIn 0.3s ease;
 }
 
 .errorBanner strong {
   display: block;
   margin-bottom: 4px;
-  color: #f87171;
+  color: #f0b7a8;
 }
 
 .errorBanner p {
-  color: #fca5a5;
+  color: #f0b7a8;
   opacity: 0.8;
 }
 
@@ -107,33 +117,6 @@
   margin-top: 2px;
 }
 
-/* --- AI Response --- */
-.aiResponse {
-  padding: 22px 26px;
-  background: rgba(52, 211, 153, 0.06);
-  border: 1px solid rgba(52, 211, 153, 0.15);
-  border-radius: 14px;
-  margin-bottom: 30px;
-  animation: fadeIn 0.5s ease;
-}
-
-.aiHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #34d399;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-}
-
-.aiResponse p {
-  color: #a7f3d0;
-  line-height: 1.7;
-  font-size: 0.95rem;
-}
-
-/* --- Section Titles --- */
 .sectionTitle {
   font-family: 'Outfit', sans-serif;
   font-size: 1.6rem;
@@ -146,22 +129,23 @@
 }
 
 .sectionIcon {
-  font-size: 1.3rem;
+  color: var(--accent-cyan);
+  font-size: 1.05rem;
 }
 
 .resultCount {
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(38, 243, 255, 0.07);
+  border: 1px solid rgba(38, 243, 255, 0.16);
   padding: 4px 12px;
   border-radius: 999px;
   margin-left: auto;
 }
 
-/* --- Results Grid --- */
 .resultsSection {
-  margin-bottom: 60px;
+  margin-bottom: 64px;
 }
 
 .resultsGrid {
@@ -170,9 +154,8 @@
   gap: 20px;
 }
 
-/* --- Browse Section --- */
 .browseSection {
-  margin-bottom: 40px;
+  margin-bottom: 44px;
 }
 
 .productsGrid {
@@ -182,7 +165,6 @@
   margin-bottom: 36px;
 }
 
-/* --- Pagination --- */
 .pagination {
   display: flex;
   justify-content: center;
@@ -193,9 +175,9 @@
 
 .pageBtn {
   padding: 10px 22px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  background: rgba(10, 18, 34, 0.68);
+  border: 1px solid rgba(160, 222, 255, 0.16);
+  border-radius: 8px;
   color: var(--text-secondary);
   font-size: 0.88rem;
   cursor: pointer;
@@ -204,9 +186,9 @@
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(0, 212, 255, 0.3);
-  color: #00d4ff;
+  background: rgba(38, 243, 255, 0.1);
+  border-color: rgba(38, 243, 255, 0.35);
+  color: var(--accent-cyan);
 }
 
 .pageBtn:disabled {
@@ -237,14 +219,14 @@
 }
 
 .pageNum:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(38, 243, 255, 0.07);
   color: var(--text-primary);
 }
 
 .pageActive {
-  background: rgba(0, 212, 255, 0.15) !important;
-  border-color: rgba(0, 212, 255, 0.3) !important;
-  color: #00d4ff !important;
+  background: rgba(38, 243, 255, 0.16) !important;
+  border-color: rgba(38, 243, 255, 0.4) !important;
+  color: var(--accent-cyan) !important;
   font-weight: 600;
 }
 
@@ -254,13 +236,6 @@
   margin-left: 8px;
 }
 
-/* --- Animations --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Responsive --- */
 @media (max-width: 768px) {
   .heroTitle {
     font-size: 2rem;

@@ -1,5 +1,7 @@
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 from SPRINT_03.WEEK_06.api.schemas import ChatRequest
+from SPRINT_03.WEEK_06.api.services.conversation_service import stream_chat_response
 
 router = APIRouter(
     prefix="/recommend/conversational",
@@ -9,36 +11,19 @@ router = APIRouter(
 
 @router.post("/")
 def conversational_recommend(request: ChatRequest):
+    """Stream a retrieval-augmented Ollama response as Server-Sent Events."""
 
-    response = (
-        f"Based on your interest in '{request.query}', "
-        "I recommend modern minimalist furniture with neutral colors "
-        "and wooden textures for a clean aesthetic."
+    return StreamingResponse(
+        stream_chat_response(
+            user_id=request.user_id,
+            query=request.query,
+            top_k=request.top_k,
+            session_id=request.session_id,
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
-
-    products = [
-        {
-            "product_id": 401,
-            "product_name": "Minimalist Sofa",
-            "category": "Sofa",
-            "score": 0.97
-        },
-        {
-            "product_id": 402,
-            "product_name": "Nordic Coffee Table",
-            "category": "Table",
-            "score": 0.93
-        },
-        {
-            "product_id": 403,
-            "product_name": "Modern Floor Lamp",
-            "category": "Lighting",
-            "score": 0.89
-        }
-    ]
-
-    return {
-        "model": "Conversational RAG Recommender",
-        "response": response,
-        "products": products
-    }

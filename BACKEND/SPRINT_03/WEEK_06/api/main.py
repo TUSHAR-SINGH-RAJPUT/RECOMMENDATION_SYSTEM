@@ -43,8 +43,8 @@ from SPRINT_03.WEEK_06.api.routes.conversational import (
 #   Current API version
 # ============================================================
 app = FastAPI(
-    title="GenAI Recommender API",
-    description="Hyper Personalized Recommendation System",
+    title="RoomSense Recommender API",
+    description="Hyper-personalized furniture recommendation system",
     version="1.0.0"
 )
 
@@ -108,7 +108,7 @@ app.include_router(conversational_router)
 def home():
 
     return {
-        "message": "GenAI Recommender API Running Successfully"
+        "message": "RoomSense Recommender API Running Successfully"
     }
 
 

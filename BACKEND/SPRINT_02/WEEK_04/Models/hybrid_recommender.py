@@ -124,7 +124,7 @@ except Exception as e:
 # ============================================================
 
 try:
-    from itr_model import (
+    from SPRINT_02.WEEK_04.Models.itr_model import (
         load_model as load_xgb_model,
         predict_ranking,
         load_user_item_matrix,
@@ -541,8 +541,13 @@ def hybrid_recommender(
     cf_recs = []
     if CF_RECOMMENDER_AVAILABLE:
         try:
-            cf_recs = recommend_cf(user_id=user_id, n=top_k * 2)
-            cf_recs = [str(r) for r in cf_recs]
+            raw_cf_recs = recommend_cf(user_id=user_id, n=top_k * 2)
+            cf_recs = [
+                str(r.get("product_id") or r.get("product_name"))
+                if isinstance(r, dict)
+                else str(r)
+                for r in raw_cf_recs
+            ]
             logger.info(f"    → {len(cf_recs)} CF candidates")
         except Exception as e:
             logger.warning(f"    ⚠ CF failed: {e}")
