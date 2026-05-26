@@ -66,12 +66,15 @@ export default function Chatbot({ userId }) {
         query,
         session_id: sessionId,
         top_k: 5,
-        onProducts: ({ products, session_id }) => {
+        onProducts: ({ products, show_products, session_id }) => {
           setSessionId(session_id);
           setMessages((current) => {
             const next = [...current];
             const last = next[next.length - 1];
-            next[next.length - 1] = { ...last, products };
+            next[next.length - 1] = {
+              ...last,
+              products: show_products ? products : [],
+            };
             return next;
           });
         },

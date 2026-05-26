@@ -22,16 +22,7 @@ from SPRINT_03.WEEK_06.api.services.recommendation_service import (
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral")
 MEMORY_TURNS = int(os.getenv("CHAT_MEMORY_TURNS", "8"))
-PRODUCT_HINTS = {
-    "recommend",
-    "recommendation",
-    "recommendations",
-    "suggest",
-    "show",
-    "find",
-    "buy",
-    "product",
-    "products",
+PRODUCT_CATEGORIES = {
     "bed",
     "beds",
     "chair",
@@ -45,10 +36,14 @@ PRODUCT_HINTS = {
     "lamp",
     "lamps",
     "lighting",
+}
+PRODUCT_ATTRIBUTES = {
     "wood",
     "wooden",
     "metal",
     "glass",
+    "plastic",
+    "fabric",
     "modern",
     "minimalist",
     "luxury",
@@ -56,11 +51,31 @@ PRODUCT_HINTS = {
     "budget",
     "price",
     "under",
-    "room",
-    "furniture",
-    "interior",
-    "decor",
 }
+SEARCH_ACTIONS = {
+    "recommend",
+    "recommendation",
+    "recommendations",
+    "suggest",
+    "show",
+    "find",
+    "buy",
+    "search",
+    "looking",
+    "need",
+    "want",
+}
+CATALOG_OVERVIEW_WORDS = {
+    "category",
+    "categories",
+    "types",
+    "kinds",
+    "offer",
+    "offers",
+    "available",
+    "have",
+}
+CATALOG_CATEGORIES = "beds, chairs, sofas, tables, desks, and lighting"
 
 ConversationMemory = Deque[Dict[str, str]]
 _memory: Dict[str, ConversationMemory] = defaultdict(
@@ -107,7 +122,18 @@ def _clean_query(query: str) -> str:
 
 def _has_product_intent(query: str) -> bool:
     cleaned = _clean_query(query)
-    return any(hint in cleaned.split() for hint in PRODUCT_HINTS)
+    tokens = set(cleaned.split())
+
+    if tokens & CATALOG_OVERVIEW_WORDS and not tokens & PRODUCT_CATEGORIES:
+        return False
+
+    if tokens & PRODUCT_CATEGORIES:
+        return True
+
+    if tokens & SEARCH_ACTIONS and tokens & PRODUCT_ATTRIBUTES:
+        return True
+
+    return False
 
 
 def build_product_prompt(
@@ -149,6 +175,7 @@ Rules:
 - Answer naturally in 1-3 short sentences.
 - Be warm, useful, and conversational.
 - If the user asks for furniture, products, prices, styles, rooms, or recommendations, tell them you can search the catalog for them.
+- If the user asks what categories are available, say the catalog includes: {CATALOG_CATEGORIES}.
 - Do not invent product details unless product context is provided.
 
 Conversation history:
@@ -215,6 +242,7 @@ async def stream_chat_response(
         "products",
         {
             "products": products,
+            "show_products": product_intent,
             "session_id": key,
             "created_at": int(time.time()),
         },
