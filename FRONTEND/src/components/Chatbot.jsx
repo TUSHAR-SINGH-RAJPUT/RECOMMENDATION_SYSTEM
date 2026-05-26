@@ -18,7 +18,7 @@ export default function Chatbot({ userId }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Hi, I am RoomSense. Tell me your room, style, budget, or material preference and I will recommend matching furniture.',
+      content: 'Hi, I am RoomSense. I can chat normally, and when you ask about furniture I will search the catalog for good matches.',
     },
   ]);
   const [streaming, setStreaming] = useState(false);
@@ -111,7 +111,7 @@ export default function Chatbot({ userId }) {
         <header className={styles.header}>
           <div>
             <h2>RoomSense Assistant</h2>
-            <span>Streaming RAG chatbot</span>
+            <span>Local Mistral + product search</span>
           </div>
           <button type="button" onClick={() => setOpen(false)} className={styles.closeBtn}>
             x
@@ -147,7 +147,7 @@ export default function Chatbot({ userId }) {
           <input
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Ask for a sofa, desk, chair, budget..."
+            placeholder="Chat or ask for a sofa, desk, budget..."
             disabled={streaming}
           />
           <button type="submit" disabled={streaming || !input.trim()}>
