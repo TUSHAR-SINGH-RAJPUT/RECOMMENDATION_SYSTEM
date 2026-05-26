@@ -1,5 +1,10 @@
 import styles from './RecommendationCard.module.css';
 
+function extractPrice(description) {
+  const match = description?.match(/price:\s*(\d+)/i);
+  return match ? `$${match[1]}` : null;
+}
+
 function getCategoryColor(category) {
   const colors = {
     bed: '#ff5ea8',
@@ -24,6 +29,7 @@ export default function RecommendationCard({ product, rank }) {
   const catColor = getCategoryColor(product.category);
   const scoreColor = getScoreColor(score);
   const scorePercent = Math.max(0, Math.min(100, Math.round(score * 100)));
+  const price = extractPrice(product.description);
 
   return (
     <div className={styles.card} style={{ animationDelay: `${rank * 0.08}s` }}>
@@ -34,6 +40,7 @@ export default function RecommendationCard({ product, rank }) {
           <span className={styles.badge} style={{ background: `${catColor}20`, color: catColor, borderColor: `${catColor}40` }}>
             {product.category}
           </span>
+          {price && <span className={styles.price}>{price}</span>}
           <span className={styles.pid}>{product.product_id}</span>
         </div>
 

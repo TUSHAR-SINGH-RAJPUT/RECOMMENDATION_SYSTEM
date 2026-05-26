@@ -61,6 +61,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 12px;
   margin-left: 30px;
 }
@@ -79,6 +80,14 @@
   font-size: 0.7rem;
   color: var(--text-dim);
   font-family: 'JetBrains Mono', monospace;
+}
+
+.price {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--brass);
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
 }
 
 .name {

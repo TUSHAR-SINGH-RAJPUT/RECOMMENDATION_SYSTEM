@@ -120,7 +120,13 @@ def normalize_product(item: Any, fallback_score: float = 0.0) -> Dict[str, Any]:
             or "unknown"
         )
         score = _safe_float(
-            item.get("score", item.get("final_score", item.get("content_score"))),
+            item.get(
+                "score",
+                item.get(
+                    "recommendation_score",
+                    item.get("final_score", item.get("content_score")),
+                ),
+            ),
             fallback_score,
         )
         metadata = {
@@ -135,6 +141,7 @@ def normalize_product(item: Any, fallback_score: float = 0.0) -> Dict[str, Any]:
                 "category",
                 "description",
                 "score",
+                "recommendation_score",
             }
         }
         return {
@@ -205,5 +212,5 @@ def get_hybrid_recommendations(
         category=category,
         use_xgboost=use_xgboost,
     )
-    products = normalize_products(raw_items)
+    products = [_enrich_from_catalog(product) for product in normalize_products(raw_items)]
     return normalize_scores(products, floor=0.70, ceiling=0.98)
