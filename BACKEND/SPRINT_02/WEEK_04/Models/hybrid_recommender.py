@@ -323,7 +323,8 @@ def _compute_features(
     product_id: str,
     cf_recs: List,
     content_recs: List[Dict],
-    user_profile: Dict
+    user_profile: Dict,
+    query_category: Optional[str] = None
 ) -> Dict[str, float]:
     """
     Compute the 6 feature scores for one candidate product.
@@ -418,7 +419,13 @@ def _compute_features(
         "embedding_similarity": embedding_similarity,
         "price_score": price_score,
         "style_match": style_score,
-        "item_popularity": item_popularity
+        "item_popularity": item_popularity,
+        "query_category_match": _category_match_score(
+            product_id=product_id,
+            query_category=query_category,
+            meta=meta,
+            furn=furn,
+        )
     }
 
 
@@ -430,12 +437,13 @@ def _compute_features(
 # Weights tuned to match the spirit of the hybrid approach.
 #
 FALLBACK_WEIGHTS = {
-    "cf_score":            0.30,
-    "content_score":       0.25,
-    "embedding_similarity": 0.20,
-    "price_score":         0.10,
-    "style_match":         0.10,
-    "item_popularity":     0.05
+    "content_score":        0.45,
+    "query_category_match":  0.20,
+    "cf_score":             0.15,
+    "embedding_similarity":  0.10,
+    "price_score":          0.05,
+    "style_match":          0.03,
+    "item_popularity":      0.02
 }
 
 
@@ -456,6 +464,107 @@ def _weighted_score(features: Dict[str, float]) -> float:
         FALLBACK_WEIGHTS.get(feat, 0.0) * value
         for feat, value in features.items()
     )
+
+
+CATEGORY_HINTS = {
+    "bed": {"bed", "beds", "king", "queen", "mattress", "sleep"},
+    "chair": {"chair", "chairs", "seat", "seating"},
+    "sofa": {"sofa", "sofas", "couch", "sectional"},
+    "table": {"table", "tables", "dining"},
+    "desk": {"desk", "desks", "workstation", "office"},
+}
+
+
+def _clean_tokens(text: str) -> set:
+    punctuation = "?!.,;:()[]{}\"'"
+    cleaned = str(text or "").lower()
+    for mark in punctuation:
+        cleaned = cleaned.replace(mark, " ")
+    return set(cleaned.split())
+
+
+def _infer_query_category(query: str, category: Optional[str] = None) -> Optional[str]:
+    """Infer a catalog category from the user's search text."""
+
+    if category:
+        return str(category).strip().lower()
+
+    tokens = _clean_tokens(query)
+    for category_name, hints in CATEGORY_HINTS.items():
+        if tokens & hints:
+            return category_name
+
+    return None
+
+
+def _candidate_ids(product_id: str) -> List[str]:
+    """Return likely ID variants used by older sprint data files."""
+
+    pid = str(product_id)
+    candidates = [pid]
+    if pid.isdigit():
+        number = int(pid)
+        candidates.extend([f"P{number}", f"P{max(number - 1, 0)}"])
+    elif pid.startswith("P") and pid[1:].isdigit():
+        candidates.append(pid[1:])
+    return candidates
+
+
+def _resolve_product_id(product_id: str, meta: pd.DataFrame, furn: pd.DataFrame) -> str:
+    """Map numeric CF IDs to the product IDs used by metadata when possible."""
+
+    for candidate in _candidate_ids(product_id):
+        if not meta.empty and candidate in set(meta["product_id"].astype(str)):
+            return candidate
+        if not furn.empty and candidate in set(furn["product_id"].astype(str)):
+            return candidate
+    return str(product_id)
+
+
+def _lookup_product_info(product_id: str, meta: pd.DataFrame, furn: pd.DataFrame) -> Dict[str, Any]:
+    """Look up product metadata from the Week 03 metadata or Furniture.csv."""
+
+    for candidate in _candidate_ids(product_id):
+        if not meta.empty:
+            row = meta[meta["product_id"].astype(str) == candidate]
+            if not row.empty:
+                item = row.iloc[0]
+                return {
+                    "product_id": candidate,
+                    "product_name": item.get("product_name", candidate),
+                    "category": str(item.get("category", "")).lower(),
+                    "description": item.get("description", ""),
+                }
+
+        if not furn.empty:
+            row = furn[furn["product_id"].astype(str) == candidate]
+            if not row.empty:
+                item = row.iloc[0]
+                category = str(item.get("category", "")).lower()
+                material = str(item.get("material", "")).lower()
+                color = str(item.get("color", "")).lower()
+                price = item.get("price", "")
+                return {
+                    "product_id": candidate,
+                    "product_name": f"{material} {category}".strip() or candidate,
+                    "category": category,
+                    "description": f"{material} {category} in {color} color. price: {int(price) if pd.notna(price) else price}",
+                }
+
+    return {
+        "product_id": str(product_id),
+        "product_name": str(product_id),
+        "category": "",
+        "description": "",
+    }
+
+
+def _category_match_score(product_id: str, query_category: Optional[str], meta: pd.DataFrame, furn: pd.DataFrame) -> float:
+    if not query_category:
+        return 0.5
+
+    info = _lookup_product_info(product_id, meta, furn)
+    return 1.0 if info.get("category") == query_category else 0.0
 
 
 # ============================================================
@@ -509,6 +618,9 @@ def hybrid_recommender(
     # Ensure data cache is loaded
     # --------------------------------------------------------
     _load_data_cache()
+    furn = _cache.get("furn", pd.DataFrame())
+    meta = _cache.get("meta", pd.DataFrame())
+    query_category = _infer_query_category(query=query, category=category)
 
     # --------------------------------------------------------
     # STEP 1: Content-based candidates (Week 03)
@@ -521,7 +633,7 @@ def hybrid_recommender(
             content_recs = search_products(
                 query=query,
                 top_k=top_k * 2,        # fetch more than needed for merging
-                category=category
+                category=category or query_category
             )
             logger.info(f"    → {len(content_recs)} content candidates")
         except Exception as e:
@@ -531,7 +643,10 @@ def hybrid_recommender(
         logger.info("    → Content recommender unavailable (skipped)")
 
     # Extract product IDs from content results
-    content_pids = [str(r.get("product_id", "")) for r in content_recs]
+    content_pids = [
+        _resolve_product_id(str(r.get("product_id", "")), meta, furn)
+        for r in content_recs
+    ]
 
     # --------------------------------------------------------
     # STEP 2: Collaborative filter candidates (Week 02)
@@ -543,11 +658,16 @@ def hybrid_recommender(
         try:
             raw_cf_recs = recommend_cf(user_id=user_id, n=top_k * 2)
             cf_recs = [
-                str(r.get("product_id") or r.get("product_name"))
+                _resolve_product_id(str(r.get("product_id") or r.get("product_name")), meta, furn)
                 if isinstance(r, dict)
-                else str(r)
+                else _resolve_product_id(str(r), meta, furn)
                 for r in raw_cf_recs
             ]
+            if query_category:
+                cf_recs = [
+                    pid for pid in cf_recs
+                    if _category_match_score(pid, query_category, meta, furn) > 0
+                ]
             logger.info(f"    → {len(cf_recs)} CF candidates")
         except Exception as e:
             logger.warning(f"    ⚠ CF failed: {e}")
@@ -613,6 +733,24 @@ def hybrid_recommender(
                 product_embeddings=_cache["embeddings"],
                 feature_cols=feature_cols
             )
+            xgb_rank = {str(pid): idx for idx, pid in enumerate(ranked_pids)}
+            total_ranked = max(len(ranked_pids), 1)
+            scored = []
+
+            for pid in ranked_pids:
+                features = _compute_features(
+                    product_id=pid,
+                    cf_recs=cf_recs,
+                    content_recs=content_recs,
+                    user_profile=user_profile,
+                    query_category=query_category,
+                )
+                xgb_boost = 1.0 - (xgb_rank.get(str(pid), total_ranked) / total_ranked)
+                score = _weighted_score(features) + (0.05 * xgb_boost)
+                scored.append((pid, score, features))
+
+            scored.sort(key=lambda x: x[1], reverse=True)
+            ranked_pids = [pid for pid, _, _ in scored]
 
         except Exception as e:
             logger.warning(f"    ⚠ XGBoost ranking failed: {e}. Falling back.")
@@ -629,7 +767,8 @@ def hybrid_recommender(
                 product_id=pid,
                 cf_recs=cf_recs,
                 content_recs=content_recs,
-                user_profile=user_profile
+                user_profile=user_profile,
+                query_category=query_category,
             )
             score = _weighted_score(features)
             scored.append((pid, score, features))
@@ -649,9 +788,6 @@ def hybrid_recommender(
         str(r.get("product_id", "")): r for r in content_recs
     }
 
-    furn = _cache.get("furn", pd.DataFrame())
-    meta = _cache.get("meta", pd.DataFrame())
-
     for pid in ranked_pids[:top_k]:
 
         # ---- Compute features for score breakdown ----
@@ -659,7 +795,8 @@ def hybrid_recommender(
             product_id=pid,
             cf_recs=cf_recs,
             content_recs=content_recs,
-            user_profile=user_profile
+            user_profile=user_profile,
+            query_category=query_category,
         )
 
         # ---- Compute final score ----
