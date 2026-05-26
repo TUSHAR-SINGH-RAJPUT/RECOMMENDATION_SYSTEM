@@ -75,6 +75,39 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def _clamp_score(value: float) -> float:
+    return max(0.0, min(1.0, value))
+
+
+def normalize_scores(
+    products: List[Dict[str, Any]],
+    *,
+    floor: float,
+    ceiling: float,
+) -> List[Dict[str, Any]]:
+    """Normalize raw model scores into a stable 0-1 display band."""
+
+    if not products:
+        return products
+
+    raw_scores = [_safe_float(item.get("score")) for item in products]
+    min_score = min(raw_scores)
+    max_score = max(raw_scores)
+
+    for item, raw_score in zip(products, raw_scores):
+        item.setdefault("metadata", {})
+        item["metadata"]["raw_score"] = raw_score
+
+        if max_score > min_score:
+            normalized = (raw_score - min_score) / (max_score - min_score)
+        else:
+            normalized = 1.0 if raw_score > 0 else 0.0
+
+        item["score"] = round(_clamp_score(floor + (ceiling - floor) * normalized), 4)
+
+    return products
+
+
 def normalize_product(item: Any, fallback_score: float = 0.0) -> Dict[str, Any]:
     """Convert recommender-specific result objects into one API product shape."""
 
@@ -135,9 +168,10 @@ def get_embedding_recommendations(
 ) -> List[Dict[str, Any]]:
     """Return semantic product matches from the ChromaDB-backed search engine."""
 
-    return normalize_products(
+    products = normalize_products(
         search_products(query=query, top_k=top_k, category=category)
     )
+    return normalize_scores(products, floor=0.55, ceiling=0.84)
 
 
 def get_collaborative_recommendations(
@@ -151,7 +185,8 @@ def get_collaborative_recommendations(
         _enrich_from_catalog(item) if isinstance(item, dict) else item
         for item in raw_items
     ]
-    return normalize_products(enriched_items)
+    products = normalize_products(enriched_items)
+    return normalize_scores(products, floor=0.35, ceiling=0.68)
 
 
 def get_hybrid_recommendations(
@@ -170,21 +205,5 @@ def get_hybrid_recommendations(
         category=category,
         use_xgboost=use_xgboost,
     )
-    normalized = normalize_products(raw_items)
-
-    # Hybrid final_score is a weighted/LTR display score, not the same scale as
-    # embedding similarity. Re-scale for UI readability while preserving raw
-    # feature values inside metadata.
-    scores = [item["score"] for item in normalized]
-    if scores:
-        min_score = min(scores)
-        max_score = max(scores)
-        if max_score > min_score:
-            for item in normalized:
-                item["metadata"]["raw_hybrid_score"] = item["score"]
-                item["score"] = round(
-                    0.55 + 0.44 * ((item["score"] - min_score) / (max_score - min_score)),
-                    4,
-                )
-
-    return normalized
+    products = normalize_products(raw_items)
+    return normalize_scores(products, floor=0.70, ceiling=0.98)

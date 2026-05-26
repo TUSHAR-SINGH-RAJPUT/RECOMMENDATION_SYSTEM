@@ -13,7 +13,7 @@ export default function useRecommendations() {
   const [metrics, setMetrics] = useState(null);
   const [userId] = useState(() => Math.floor(Math.random() * 500) + 1);
 
-  const fetchRecommendations = useCallback(async (query) => {
+  const fetchRecommendations = useCallback(async (query, options = {}) => {
     if (!query?.trim()) return;
 
     setLoading(true);
@@ -21,24 +21,29 @@ export default function useRecommendations() {
 
     try {
       let response;
+      const model = options.model || selectedModel;
 
-      if (selectedModel === 'embedding') {
+      if (model === 'embedding') {
         response = await getEmbeddingRecommendations({ query });
-      } else if (selectedModel === 'collaborative') {
+      } else if (model === 'collaborative') {
         response = await getCollaborativeRecommendations({ user_id: userId, query });
-      } else if (selectedModel === 'hybrid') {
-        response = await getHybridRecommendations({ user_id: userId, query });
+      } else if (model === 'hybrid') {
+        response = await getHybridRecommendations({ user_id: userId, query, top_k: options.top_k || 10 });
       } else {
-        throw new Error(`Unknown model: ${selectedModel}`);
+        throw new Error(`Unknown model: ${model}`);
       }
 
-      const products = response.data.recommendations || [];
+      let products = response.data.recommendations || [];
+      if (options.excludeProductId) {
+        products = products.filter((product) => product.product_id !== options.excludeProductId);
+      }
       setResults(products);
       setMetrics({
-        model: selectedModel,
+        model,
         responseTime: response.responseTime,
         resultCount: products.length,
         timestamp: new Date().toLocaleTimeString(),
+        sourceProduct: options.sourceProduct || null,
       });
     } catch (err) {
       console.error('Recommendation fetch error:', err);

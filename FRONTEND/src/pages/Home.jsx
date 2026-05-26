@@ -91,6 +91,27 @@ export default function Home() {
     });
   }
 
+  function handleProductSelect(product) {
+    const query = [
+      product.product_name,
+      product.category,
+      product.description,
+    ].filter(Boolean).join(' ');
+
+    setSelectedModel('hybrid');
+    fetchRecommendations(query, {
+      model: 'hybrid',
+      top_k: 12,
+      excludeProductId: product.product_id,
+      sourceProduct: product.product_name,
+    });
+
+    window.scrollTo({
+      top: document.querySelector('main')?.offsetTop - 80,
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <div className={styles.page} ref={rootRef}>
       <Navbar selectedModel={selectedModel} onModelChange={setSelectedModel} />
@@ -136,7 +157,7 @@ export default function Home() {
           <section className={styles.resultsSection} data-reveal>
             <h2 className={styles.sectionTitle}>
               <span className={styles.sectionIcon}>*</span>
-              Recommendations
+              {metrics?.sourceProduct ? `Similar to ${metrics.sourceProduct}` : 'Recommendations'}
               <span className={styles.resultCount}>{results.length} results</span>
             </h2>
             <div className={styles.resultsGrid}>
@@ -161,7 +182,7 @@ export default function Home() {
           <div className={styles.productsGrid}>
             {currentProducts.map((product) => (
               <div key={product.product_id} data-card>
-                <ProductCard product={product} />
+                <ProductCard product={product} onSelect={handleProductSelect} />
               </div>
             ))}
           </div>

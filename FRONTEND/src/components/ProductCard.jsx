@@ -7,21 +7,26 @@ function extractPrice(description) {
 
 function getCategoryColor(category) {
   const colors = {
-    bed: '#c47b67',
-    chair: '#d7a15f',
-    sofa: '#8fa06d',
-    table: '#b86f52',
-    desk: '#b08a61',
+    bed: '#ff5ea8',
+    chair: '#26f3ff',
+    sofa: '#3fffb0',
+    table: '#a78bfa',
+    desk: '#5aa7ff',
   };
-  return colors[category?.toLowerCase()] || '#a08770';
+  return colors[category?.toLowerCase()] || '#88a2b4';
 }
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, onSelect }) {
   const price = extractPrice(product.description);
   const catColor = getCategoryColor(product.category);
 
   return (
-    <div className={styles.card}>
+    <button
+      className={styles.card}
+      type="button"
+      onClick={() => onSelect?.(product)}
+      aria-label={`Find products similar to ${product.product_name}`}
+    >
       <div className={styles.cardInner}>
         <div className={styles.header}>
           <span className={styles.badge} style={{ background: `${catColor}20`, color: catColor, borderColor: `${catColor}40` }}>
@@ -38,6 +43,6 @@ export default function ProductCard({ product }) {
           <span className={styles.id}>{product.product_id}</span>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

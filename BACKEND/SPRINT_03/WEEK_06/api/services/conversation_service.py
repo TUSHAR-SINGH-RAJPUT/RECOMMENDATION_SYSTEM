@@ -22,6 +22,38 @@ from SPRINT_03.WEEK_06.api.services.recommendation_service import (
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral")
 MEMORY_TURNS = int(os.getenv("CHAT_MEMORY_TURNS", "8"))
+GREETING_REPLIES = {
+    "hi",
+    "hii",
+    "hello",
+    "hey",
+    "yo",
+    "sup",
+    "good morning",
+    "good afternoon",
+    "good evening",
+}
+PRODUCT_HINTS = {
+    "bed",
+    "chair",
+    "sofa",
+    "table",
+    "desk",
+    "lamp",
+    "lighting",
+    "wood",
+    "wooden",
+    "metal",
+    "glass",
+    "modern",
+    "minimalist",
+    "luxury",
+    "classic",
+    "budget",
+    "price",
+    "room",
+    "furniture",
+}
 
 ConversationMemory = Deque[Dict[str, str]]
 _memory: Dict[str, ConversationMemory] = defaultdict(
@@ -58,13 +90,33 @@ def _format_history(history: ConversationMemory) -> str:
     )
 
 
+def _clean_query(query: str) -> str:
+    return " ".join(query.lower().strip().replace("?", "").replace("!", "").split())
+
+
+def _is_greeting(query: str) -> bool:
+    cleaned = _clean_query(query)
+    return cleaned in GREETING_REPLIES
+
+
+def _has_product_intent(query: str) -> bool:
+    cleaned = _clean_query(query)
+    return any(hint in cleaned.split() for hint in PRODUCT_HINTS)
+
+
 def build_prompt(query: str, products: List[Dict], history: ConversationMemory) -> str:
     """Build a grounded shopping-assistant prompt for RAG generation."""
 
-    return f"""You are RoomSense, a concise and helpful furniture shopping assistant.
-Use the retrieved product context to recommend relevant furniture. Stay grounded
-in the product context, mention product names naturally, and ask one useful
-follow-up question when more preference details would improve the recommendation.
+    return f"""You are RoomSense, a concise, human furniture shopping assistant.
+Do not sound like a scripted sales bot.
+
+Rules:
+- Answer in 1-3 short sentences.
+- Mention at most two product names.
+- Do not list every retrieved product.
+- Ask at most one natural follow-up question.
+- If the user is just greeting or chatting, do not recommend products.
+- Stay grounded in the product context when recommending.
 
 Conversation history:
 {_format_history(history)}
@@ -75,7 +127,7 @@ Retrieved product context:
 User query:
 {query}
 
-Answer in a natural conversational style with practical buying guidance."""
+Answer like a real person helping in a store, not a report."""
 
 
 def _sse(event: str, data: Dict) -> str:
@@ -93,6 +145,39 @@ async def stream_chat_response(
 
     key = _session_key(user_id, session_id)
     history = _memory[key]
+
+    if _is_greeting(query):
+        answer = "Hey, I am RoomSense. Tell me what kind of furniture you want, and I will keep it short."
+        history.append({"role": "user", "content": query})
+        history.append({"role": "assistant", "content": answer})
+        yield _sse(
+            "products",
+            {
+                "products": [],
+                "session_id": key,
+                "created_at": int(time.time()),
+            },
+        )
+        yield _sse("token", {"token": answer})
+        yield _sse("done", {"response": answer, "session_id": key})
+        return
+
+    if not _has_product_intent(query):
+        answer = "Got you. Tell me the item, style, material, room, or budget and I will recommend a few good matches."
+        history.append({"role": "user", "content": query})
+        history.append({"role": "assistant", "content": answer})
+        yield _sse(
+            "products",
+            {
+                "products": [],
+                "session_id": key,
+                "created_at": int(time.time()),
+            },
+        )
+        yield _sse("token", {"token": answer})
+        yield _sse("done", {"response": answer, "session_id": key})
+        return
+
     products = get_embedding_recommendations(query=query, top_k=top_k)
     prompt = build_prompt(query=query, products=products, history=history)
 
@@ -116,7 +201,7 @@ async def stream_chat_response(
                     "model": OLLAMA_MODEL,
                     "prompt": prompt,
                     "stream": True,
-                    "options": {"temperature": 0.7},
+                    "options": {"temperature": 0.45, "num_predict": 90},
                 },
             ) as response:
                 response.raise_for_status()

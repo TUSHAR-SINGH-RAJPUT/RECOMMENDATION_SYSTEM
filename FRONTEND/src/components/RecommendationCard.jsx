@@ -2,24 +2,25 @@ import styles from './RecommendationCard.module.css';
 
 function getCategoryColor(category) {
   const colors = {
-    bed: '#c47b67',
-    chair: '#d7a15f',
-    sofa: '#8fa06d',
-    table: '#b86f52',
-    desk: '#b08a61',
-    lighting: '#f4c987',
+    bed: '#ff5ea8',
+    chair: '#26f3ff',
+    sofa: '#3fffb0',
+    table: '#a78bfa',
+    desk: '#5aa7ff',
+    lighting: '#ffd166',
   };
-  return colors[category?.toLowerCase()] || '#a08770';
+  return colors[category?.toLowerCase()] || '#88a2b4';
 }
 
 function getScoreColor(score) {
-  if (score >= 0.8) return '#8fa06d';
-  if (score >= 0.5) return '#d7a15f';
-  return '#c47b67';
+  if (score >= 0.8) return '#3fffb0';
+  if (score >= 0.5) return '#26f3ff';
+  return '#ff5ea8';
 }
 
 export default function RecommendationCard({ product, rank }) {
-  const score = Number(product.score ?? product.final_score ?? 0);
+  const rawScore = Number(product.score ?? product.final_score ?? 0);
+  const score = Math.max(0, Math.min(1, rawScore));
   const catColor = getCategoryColor(product.category);
   const scoreColor = getScoreColor(score);
   const scorePercent = Math.max(0, Math.min(100, Math.round(score * 100)));
