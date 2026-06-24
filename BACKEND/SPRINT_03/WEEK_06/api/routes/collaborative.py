@@ -6,6 +6,7 @@ from SPRINT_03.WEEK_06.api.services.recommendation_service import (
 )
 
 router = APIRouter(
+      
     prefix="/recommend/collaborative",
     tags=["Collaborative Filtering"]
 )

@@ -30,6 +30,8 @@ export default function Home() {
   } = useRecommendations();
 
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // Shuffle products once on initial load to provide a varied browsing experience each time the app is opened
   const [shuffledProducts] = useState(() => {
     const arr = [...productsData];
     for (let i = arr.length - 1; i > 0; i--) {

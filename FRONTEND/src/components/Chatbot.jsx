@@ -18,7 +18,7 @@ export default function Chatbot({ userId }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Hi, I am RoomSense. I can chat normally, and when you ask about furniture I will search the catalog for good matches.',
+      content: '✨ Welcome to RoomSense.\nYour smart furniture assistant for discovering stylish, functional, and personalized interiors.\n\nAsk me anything — from modern sofas to complete room setups, and I’ll find the best matches for you.',
     },
   ]);
   const [streaming, setStreaming] = useState(false);
@@ -65,7 +65,7 @@ export default function Chatbot({ userId }) {
         user_id: userId,
         query,
         session_id: sessionId,
-        top_k: 5,
+        top_k: 10,
         onProducts: ({ products, show_products, session_id }) => {
           setSessionId(session_id);
           setMessages((current) => {
